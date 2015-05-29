@@ -1,0 +1,55 @@
+<?php
+
+/**
+ * Implements hook_schema().
+ */
+function webform_to_gdocs_schema() {
+  $schema = array();
+
+  $schema['webform_to_gdocs_webforms'] = array(
+    'description' => 'Table for storing individual webform settings.',
+    'fields' => array(
+      'nid' => array(
+        'description' => 'The node identifier of a webform.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'gdoc_type' => array(
+        'description' => 'The type of the Google Doc.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => FALSE,
+      ),
+      'gdoc_id' => array(
+        'description' => 'The ID of the Google Doc.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => FALSE,
+      ),
+      'gdoc_sheet' => array(
+        'description' => 'The ID of the Google Doc worksheet to use.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => FALSE,
+      ),
+    ),
+    'primary key' => array('nid'),
+  );
+
+  return $schema;
+}
+
+/**
+ * Implements hook_install().
+ */
+function webform_to_gdocs_install() {
+  drupal_install_schema('webform_to_gdocs');
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function webform_to_gdocs_uninstall() {
+  drupal_uninstall_schema('webform_to_gdocs');
+}
