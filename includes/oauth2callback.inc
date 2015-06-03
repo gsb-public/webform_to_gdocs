@@ -6,9 +6,9 @@ function webform_to_gdocs_oauth2callback() {
         return drupal_not_found();
     }
 
-    $client_id = variable_get('webform_to_gdocs_client_id');
-    $client_secret = variable_get('webform_to_gdocs_client_secret');
-    $app_name = variable_get('webform_to_gdocs_app_name');
+    $client_id = variable_get('webform_to_gdocs_client_id', '');
+    $client_secret = variable_get('webform_to_gdocs_client_secret', '');
+    $app_name = variable_get('webform_to_gdocs_app_name', '');
 
     if (!$client_id || !$client_secret || !$app_name) {
         return drupal_not_found();
