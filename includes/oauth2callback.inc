@@ -25,5 +25,5 @@ function webform_to_gdocs_oauth2callback() {
 
     drupal_set_message('Account authorized.');
     print '<script>window.opener.location = window.opener.location; window.close()</script>';
-    exit();
+    return '';
 }

@@ -7,7 +7,7 @@ require_once __DIR__ . '/google-api-php-client/src/Google/autoload.php';
  */
 function webform_to_gdocs_menu() {
 
-  $items['admin/settings/webform-to-gdocs'] = array(
+  $items['admin/config/content/webform-to-gdocs'] = array(
     'title' => 'Webform to Google Docs',
     'description' => 'Configure the Webform to Google Docs module.',
     'page callback' => 'drupal_get_form',
@@ -60,11 +60,11 @@ function webform_to_gdocs_nodeapi(&$node, $op) {
  * Callbacks for a Webform submission.
  */
 function webform_to_gdocs_webform_submission_insert($node, $submission) {
-
   // Is this Webform attached to a Google Doc?
-  $result = db_fetch_array(db_query("SELECT * FROM {webform_to_gdocs_webforms} gw WHERE gw.nid = %d LIMIT 1", $node->nid));
+  $qresult = db_query("SELECT * FROM {webform_to_gdocs_webforms} gw WHERE gw.nid = :nid LIMIT 1", array(':nid' =>$node->nid));
+  $result = $qresult->fetchAssoc();
 
-  if (!count($result) || empty($result['gdoc_id']) || empty($result['gdoc_sheet'])) {
+  if (0 == $qresult->rowCount() || empty($result['gdoc_name']) || empty($result['gdoc_sheet'])) {
     return;
   }
 
@@ -96,16 +96,15 @@ function webform_to_gdocs_webform_submission_insert($node, $submission) {
 
     $google_row[$spreadsheet_column] = $insert_value;
   }
-
   try {
     // Ensure we have a working access token.
     _webform_to_gdocs_google_drive_get_service();
-    $access_token = variable_get('webform_to_gdocs_access_token');
+    $access_token = variable_get('webform_to_gdocs_access_token', '');
     $access_token = @json_decode($access_token);
 
     // Insert it via Google Spreadsheets API.
     $ch = curl_init();
-    $url = 'https://spreadsheets.google.com/feeds/list/' . $result['gdoc_id'] . '/' . $result['gdoc_sheet'] . '/private/full';
+    $url = 'https://spreadsheets.google.com/feeds/list/' . $result['gdoc_name'] . '/' . $result['gdoc_sheet'] . '/private/full';
 
     $post_body = '<entry xmlns="http://www.w3.org/2005/Atom" xmlns:gsx="http://schemas.google.com/spreadsheets/2006/extended">';
     foreach ($google_row as $col => $val) {

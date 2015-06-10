@@ -1,5 +1,5 @@
 name = Webform to Google Docs
-description = Allows Webform Submissions to be automatically entered into Google spreadsheets.
-core = 6.x
+description = Allows Webform Submissions to be automatically entered into Google Docs or Spreadsheets.
+core = 7.x
 package = Webform
 dependencies[] = webform

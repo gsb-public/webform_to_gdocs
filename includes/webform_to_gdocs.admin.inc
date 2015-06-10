@@ -38,9 +38,9 @@ function webform_to_gdocs_configure_form($form_state) {
 
   if (strlen($form['client_id']['#default_value']) > 0 && strlen($form['client_secret']['#default_value']) > 0) {
 
-    $form['oauth_markup'] = array('#value' => '');
-    $form['oauth_markup']['#value'] .= '<script type="text/javascript" src="https://apis.google.com/js/client.js"></script>';
-    $form['oauth_markup']['#value'] .= '<script>
+    $form['oauth_markup'] = array('#markup' => '');
+    $form['oauth_markup']['#markup'] .= '<script type="text/javascript" src="https://apis.google.com/js/client.js"></script>';
+    $form['oauth_markup']['#markup'] .= '<script>
       function handleClientLoad() {
         gapi.auth.authorize({
           "client_id": "' . $form['client_id']['#default_value'] . '",
