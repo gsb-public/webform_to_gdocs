@@ -156,12 +156,12 @@ function _webform_to_gdocs_google_drive_get_service() {
 
   $client = new Google_Client();
 
-  $client->setApplicationName(variable_get('webform_to_gdocs_app_name'));
-  $client->setClientId(variable_get('webform_to_gdocs_client_id'));
-  $client->setClientSecret(variable_get('webform_to_gdocs_client_secret'));
+  $client->setApplicationName(variable_get('webform_to_gdocs_app_name', ''));
+  $client->setClientId(variable_get('webform_to_gdocs_client_id', ''));
+  $client->setClientSecret(variable_get('webform_to_gdocs_client_secret', ''));
   $client->setScopes(_webform_to_gdocs_google_api_scopes());
 
-  $access_token = variable_get('webform_to_gdocs_access_token');
+  $access_token = variable_get('webform_to_gdocs_access_token', '');
   $client->setAccessToken($access_token);
 
   if ($client->getAuth()->isAccessTokenExpired()) {
