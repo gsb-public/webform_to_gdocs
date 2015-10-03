@@ -1,24 +1,6 @@
 <?php
 
 /**
- * Implements hook_requirements().
- */
-function webform_to_gdocs_requirements($phase) {
-  $requirements = array();
-
-  // Require Google_Spreadsheet.php.
-  if (!file_exists(__DIR__ . '/Google_Spreadsheet.php')) {
-    $requirements['google_spreadsheet'] = array(
-      'title' => t('Google Spreadsheet PHP Helper Class missing'),
-      'description' => t("Webform to GDocs requires the Google_Spreadsheet.php library to be placed in " . drupal_get_path('module', 'webform_to_gdocs') . "/. You can download it from " . l('https://github.com/farinspace/google-spreadsheet', 'https://github.com/farinspace/google-spreadsheet') . "."),
-      'severity' => REQUIREMENT_ERROR,
-    );
-  }
-
-  return $requirements;
-}
-
-/**
  * Implements hook_install().
  */
 function webform_to_gdocs_install() {
