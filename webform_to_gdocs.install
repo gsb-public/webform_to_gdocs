@@ -1,6 +1,13 @@
 <?php
 
 /**
+ * Implements hook_install().
+ */
+function webform_to_gdocs_install() {
+  drupal_set_message("Webform to Google Docs has been installed, but " . l("must be configured", 'admin/config/content/webform-to-gdocs') . ".", 'warning');
+}
+
+/**
  * Implements hook_schema().
  */
 function webform_to_gdocs_schema() {
@@ -21,14 +28,14 @@ function webform_to_gdocs_schema() {
         'length' => 255,
         'not null' => FALSE,
       ),
-      'gdoc_id' => array(
-        'description' => 'The ID of the Google Doc.',
+      'gdoc_name' => array(
+        'description' => 'The name of the Google Doc.',
         'type' => 'varchar',
         'length' => 255,
         'not null' => FALSE,
       ),
       'gdoc_sheet' => array(
-        'description' => 'The ID of the Google Doc worksheet to use.',
+        'description' => 'The name of the Google Doc worksheet to use.',
         'type' => 'varchar',
         'length' => 255,
         'not null' => FALSE,
@@ -41,15 +48,11 @@ function webform_to_gdocs_schema() {
 }
 
 /**
- * Implements hook_install().
- */
-function webform_to_gdocs_install() {
-  drupal_install_schema('webform_to_gdocs');
-}
-
-/**
  * Implements hook_uninstall().
  */
 function webform_to_gdocs_uninstall() {
-  drupal_uninstall_schema('webform_to_gdocs');
+  // Unset webform_to_gdocs variables.
+  variable_del('webform_to_gdocs_username');
+  variable_del('webform_to_gdocs_password');
+  variable_del('webform_to_gdocs_zend_gdata_location');
 }

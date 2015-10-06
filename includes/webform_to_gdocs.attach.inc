@@ -1,6 +1,8 @@
 <?php
 
-function webform_to_gdocs_attach_form($form_state, $node) {
+function webform_to_gdocs_attach_form($form_state, $nodedata) {
+
+  $node=$nodedata['build_info']['args'][0];
 
   $form['webform_nid'] = array(
     '#type' => 'hidden',
@@ -40,11 +42,12 @@ function webform_to_gdocs_attach_form($form_state, $node) {
   );
 
   // Select active spreadsheet data if it exists.
-  $gdoc_exists = db_fetch_array(db_query("SELECT * FROM {webform_to_gdocs_webforms} WHERE nid = %d", $node->nid));
+  $result = db_query("SELECT * FROM {webform_to_gdocs_webforms} WHERE nid = :nid",array(':nid' =>  $node->nid));
+  $gdoc_exists=$result->fetchAssoc();
 
   if ($gdoc_exists) {
 
-    $form['gdoc_id']['#default_value'] = $gdoc_exists['gdoc_id'];
+    $form['gdoc_id']['#default_value'] = $gdoc_exists['gdoc_name'];
 
     $form['gdoc_sheet'] = array(
       '#type' => 'select',
@@ -62,11 +65,11 @@ function webform_to_gdocs_attach_form($form_state, $node) {
       $access_token = @json_decode($access_token);
 
       $ch = curl_init();
-      $url = 'https://spreadsheets.google.com/feeds/worksheets/' . $gdoc_exists['gdoc_id'] . '/private/full';
+      $url = 'https://spreadsheets.google.com/feeds/worksheets/' . $gdoc_exists['gdoc_name'] . '/private/full';
 
       curl_setopt($ch, CURLOPT_URL, $url);
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-      curl_setopt($ch, CURLOPT_GET, 1);
+      curl_setopt($ch, CURLOPT_HTTPGET, 1);
       curl_setopt($ch, CURLOPT_HTTPHEADER, array(
           'Authorization: Bearer ' . $access_token->access_token,
           'Content-type: application/atom+xml'
@@ -76,8 +79,18 @@ function webform_to_gdocs_attach_form($form_state, $node) {
       $xml = simplexml_load_string($result);
       $obj = json_decode(json_encode($xml));
 
-      foreach ($obj->entry as $entry) {
-        $id_parts = explode('/', $entry->id);
+      if(is_array($obj->entry))
+      {
+        foreach ($obj->entry as $entry) {
+          $id_parts = explode('/', $entry->id);
+          $id = end($id_parts);
+          $form['gdoc_sheet']['#options'][$id] = $entry->title;
+        }
+      }
+      else
+      {
+        $entry=$obj->entry;
+                $id_parts = explode('/', $entry->id);
         $id = end($id_parts);
         $form['gdoc_sheet']['#options'][$id] = $entry->title;
       }
@@ -103,14 +116,14 @@ function webform_to_gdocs_attach_form($form_state, $node) {
 }
 
 function webform_to_gdocs_attach_form_validate($form, &$form_state) {
-  if ($form_state['values']['gdoc_id'] != '_none' && empty($form_state['values']['gdoc_sheet'])) {
-    form_set_error('gdoc_sheet', 'Enter a Worksheet Name to be used with the document you selected.');
-  }
+ // if ($form_state['values']['gdoc_id'] != '_none' && empty($form_state['values']['gdoc_sheet'])) {
+  //  form_set_error('gdoc_sheet', 'Enter a Worksheet Name to be used with the document you selected.');
+ // }
 }
 
 function webform_to_gdocs_attach_form_submit($form, &$form_state) {
-  $gdoc_exists = db_result(db_query("SELECT nid FROM {webform_to_gdocs_webforms} WHERE nid = %d", $form_state['values']['webform_nid']));
-
+  $result = db_query("SELECT nid FROM {webform_to_gdocs_webforms} WHERE nid = :nid", array(':nid' => $form_state['values']['webform_nid']));
+  $gdoc_exists = $result->fetchAssoc();
   if ($form_state['values']['gdoc_id'] == '_none') {
     // If a relationship already exists, delete it.
     if ($gdoc_exists) {
@@ -122,12 +135,20 @@ function webform_to_gdocs_attach_form_submit($form, &$form_state) {
 
   // Insert record.
   if (!$gdoc_exists) {
-    db_query("INSERT INTO {webform_to_gdocs_webforms} (nid, gdoc_type, gdoc_id, gdoc_sheet) VALUES (%d, '%s', '%s', '%s')", $form_state['values']['webform_nid'], $form_state['values']['gdoc_type'], $form_state['values']['gdoc_id'], $form_state['values']['gdoc_sheet']);
+    db_query("INSERT INTO {webform_to_gdocs_webforms} (nid, gdoc_type, gdoc_name, gdoc_sheet) VALUES (:nid, :type, :id, :sheet)",
+         array(':nid' => $form_state['values']['webform_nid'], 
+               ':type' => $form_state['values']['gdoc_type'], 
+               ':id' => $form_state['values']['gdoc_id'], 
+               ':sheet' => $form_state['values']['gdoc_sheet']));
   }
 
   // Update record.
   else {
-    db_query("UPDATE {webform_to_gdocs_webforms} SET gdoc_type = '%s', gdoc_id = '%s', gdoc_sheet = '%s' WHERE nid = %d", $form_state['values']['gdoc_type'], $form_state['values']['gdoc_id'], $form_state['values']['gdoc_sheet'], $form_state['values']['webform_nid']);
+    db_query("UPDATE {webform_to_gdocs_webforms} SET gdoc_type = :type, gdoc_name = :id, gdoc_sheet = :sheet WHERE nid = :nid", 
+       array(':type' => $form_state['values']['gdoc_type'],
+             ':id' =>  $form_state['values']['gdoc_id'], 
+             ':sheet' => $form_state['values']['gdoc_sheet'], 
+             ':nid' => $form_state['values']['webform_nid']));
   }
 
   drupal_set_message('Webform attached to Google Doc.');
