@@ -7,7 +7,12 @@ require_once __DIR__ . '/google-api-php-client/src/Google/autoload.php';
  */
 function webform_to_gdocs_menu() {
 
-  $items['admin/config/content/webform-to-gdocs'] = array(
+  $items['admin/config/content/webform/overview'] = array(
+    'title' => 'Webform settings',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+
+  $items['admin/config/content/webform/gdocs'] = array(
     'title' => 'Webform to Google Docs',
     'description' => 'Configure the Webform to Google Docs module.',
     'page callback' => 'drupal_get_form',
@@ -15,7 +20,7 @@ function webform_to_gdocs_menu() {
     'access callback' => 'user_access',
     'access arguments' => array('administer webform_to_gdocs'),
     'file' => 'includes/webform_to_gdocs.admin.inc',
-    'type' => MENU_NORMAL_ITEM,
+    'type' => MENU_LOCAL_TASK,
   );
 
   $items['node/%webform_menu/webform/gdocs'] = array(
