@@ -92,7 +92,7 @@ function webform_to_gdocs_webform_submission_insert($node, $submission) {
         break;
 
       default:
-        $insert_value = implode(', ', $value['value']);
+        $insert_value = implode(', ', (array)$value[0]);
         break;
 
     }
@@ -119,7 +119,7 @@ function webform_to_gdocs_webform_submission_insert($node, $submission) {
 
     // Insert it via Google Spreadsheets API.
     $ch = curl_init();
-    $url = 'https://spreadsheets.google.com/feeds/list/' . $result['gdoc_name'] . '/' . $result['gdoc_sheet'] . '/private/full';
+    $url = 'https://spreadsheets.google.com/feeds/list/' . _webform_to_gdocs_find_gdoc_name($result['gdoc_name']) . '/' . $result['gdoc_sheet'] . '/private/full';
 
     $post_body = '<entry xmlns="http://www.w3.org/2005/Atom" xmlns:gsx="http://schemas.google.com/spreadsheets/2006/extended">';
     foreach ($google_row as $col => $val) {
@@ -188,4 +188,12 @@ function _webform_to_gdocs_google_drive_get_service() {
   }
 
   return new Google_Service_Drive($client);
+}
+
+/**
+ * Retrieve gdoc_name from doc URL
+ */
+function _webform_to_gdocs_find_gdoc_name($gdoc_url) {
+  $gdoc_name = explode('/', $gdoc_url);
+  return $gdoc_name[5];
 }
