@@ -54,7 +54,13 @@ function webform_to_gdocs_attach_form($form_state, $nodedata) {
 function webform_to_gdocs_attach_form_validate($form, &$form_state) {
   // Check if spreadsheet is not empty and is valid
   if (!empty($form['gdoc_id']['#value'])) {
-    if (!_webform_to_gdocs_connect_worksheet($form_state['values']['gdoc_id'])) {
+    $google_spreadsheet = $form_state['values']['gdoc_id'];
+    $url_part = 'https://docs.google.com/spreadsheets/d/';
+    $valid_url = strpos($google_spreadsheet, $url_part);
+    if ($valid_url === false) {
+      form_set_error('Google Spreadsheet URL', 'Please enter valid URL.');
+    }
+    elseif (!_webform_to_gdocs_connect_worksheet($form_state['values']['gdoc_id'])) {
       form_set_error('Google Spreadsheet URL', 'This is not valid Google spreadsheet, please enter valid Google spreadsheet URL.');
     }
   }
