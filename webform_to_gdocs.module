@@ -18,7 +18,7 @@ function webform_to_gdocs_menu() {
     'page callback' => 'drupal_get_form',
     'page arguments' => array('webform_to_gdocs_configure_form'),
     'access callback' => 'user_access',
-    'access arguments' => array('administer webform_to_gdocs'),
+    'access arguments' => array('administer webform to docs'),
     'file' => 'includes/webform_to_gdocs.admin.inc',
     'type' => MENU_LOCAL_TASK,
   );
@@ -47,8 +47,15 @@ function webform_to_gdocs_menu() {
 /**
  * Implements hook_perm().
  */
-function webform_to_gdocs_perm() {
-  return array('administer webform_to_gdocs', 'attach webform to gdocs');
+function webform_to_gdocs_permission() {
+  return array(
+    'administer webform to gdocs' => array(
+      'title' => t('Administer Webform to gdocs'),
+    ),
+    'attach webform to gdocs' => array(
+      'title' => t('Attach Webform to gdocs'),
+    ),
+  );
 }
 
 /**
