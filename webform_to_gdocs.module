@@ -18,7 +18,7 @@ function webform_to_gdocs_menu() {
     'page callback' => 'drupal_get_form',
     'page arguments' => array('webform_to_gdocs_configure_form'),
     'access callback' => 'user_access',
-    'access arguments' => array('administer webform to docs'),
+    'access arguments' => array('administer webform to gdocs'),
     'file' => 'includes/webform_to_gdocs.admin.inc',
     'type' => MENU_LOCAL_TASK,
   );
