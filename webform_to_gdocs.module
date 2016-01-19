@@ -108,15 +108,17 @@ function webform_to_gdocs_webform_submission_insert($node, $submission) {
 
     $google_row[$spreadsheet_column] = $insert_value;
   }
-  
+
   // Add the webform submission data.
   $google_row['webform_draft'] = $submission->is_draft;
   $google_row['webform_serial'] = $submission->serial;
   $google_row['webform_sid'] = $submission->sid;
-	$google_row['webform_time'] = $submission->submitted;
-	$google_row['webform_uid'] = $submission->uid;
-	$google_row['webform_username'] = isset($submission->name) ? $submission->name : 'Anonymous';
-	$google_row['webform_ip_address'] = $submission->remote_addr;
+  $google_row['webform_time'] = format_date($submission->submitted, 'short');
+  $google_row['webform_completed_time'] = format_date($submission->completed, 'short');
+  $google_row['webform_modified_time'] = format_date($submission->modified, 'short');
+  $google_row['webform_uid'] = $submission->uid;
+  $google_row['webform_username'] = isset($submission->name) ? $submission->name : 'Anonymous';
+  $google_row['webform_ip_address'] = $submission->remote_addr;
 	
   try {
     // Ensure we have a working access token.
